@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {
   Keyboard,
   StatusBar,
@@ -9,29 +9,90 @@ import {
   TouchableWithoutFeedback,
   View,
 } from 'react-native';
+import isURL from 'validator/lib/isURL';
+import Toast, {BaseToast} from 'react-native-toast-message';
+
+const toastConfig = {
+  success: props => (
+    <BaseToast
+      {...props}
+      // eslint-disable-next-line react-native/no-inline-styles
+      style={{
+        borderLeftColor: '#576F72',
+        backgroundColor: '#F0EBE3',
+        width: '90%',
+      }}
+      // eslint-disable-next-line react-native/no-inline-styles
+      text1Style={{
+        fontSize: 17,
+      }}
+      // eslint-disable-next-line react-native/no-inline-styles
+      text2Style={{
+        fontSize: 15,
+      }}
+    />
+  ),
+};
 
 export default function Home() {
+  const [URL, setURL] = useState('');
+  // const [URLIsValid, setURLIsValid] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleInputURL = url => {
+    setURL(url);
+  };
+
+  const handleSubmitButton = () => {
+    setIsLoading(true);
+    if (isURL(URL) === true) {
+      console.log('url is valid');
+      Toast.show({
+        // type: 'success',
+        text2: 'Success 🎉',
+      });
+    } else {
+      Toast.show({
+        // type: 'basic',
+        text2: 'Invalid URL ☹️',
+      });
+    }
+
+    setIsLoading(false);
+  };
+
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
       <View style={styles.container}>
-        <StatusBar backgroundColor="#E4DCCF" barStyle="dark-content" />
+        <StatusBar
+          backgroundColor="#E4DCCF"
+          barStyle="dark-content"
+          // translucent={true}
+        />
 
         <Text style={styles.h1}>Instagram Autoliker</Text>
 
         <TextInput
           style={styles.inputURL}
           placeholder="Enter Instagram Post URL Here..."
+          onChangeText={text => handleInputURL(text)}
+          value={URL}
           // value="https://www.figma.com/file/COJ7URyYFqFmCSxynqjkQL/Instagram-Autoliker-Mobile?node-id=0%3A1"
         />
 
         <TouchableHighlight
           style={styles.submitButtonContainer}
           underlayColor="#576F72"
-          onPress={() => console.log('arter')}>
+          // disabled={true}
+          onPress={() => handleSubmitButton()}>
           <View style={styles.button}>
-            <Text style={styles.submitButtonText}>Submit</Text>
+            <Text style={styles.submitButtonText}>
+              {isLoading ? 'Loading...' : 'Submit'}
+            </Text>
           </View>
         </TouchableHighlight>
+
+        <Toast config={toastConfig} />
       </View>
     </TouchableWithoutFeedback>
   );
@@ -62,12 +123,14 @@ const styles = StyleSheet.create({
     marginTop: 50,
     paddingHorizontal: 15,
     color: '#737373',
+    width: '90%',
     height: 60,
     fontSize: 20,
   },
 
   submitButtonContainer: {
     backgroundColor: '#7D9D9C',
+    width: '90%',
     height: 60,
     borderRadius: 14,
     borderWidth: 2,
