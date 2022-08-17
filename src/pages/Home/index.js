@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   Keyboard,
   StatusBar,
@@ -34,10 +34,36 @@ const toastConfig = {
   ),
 };
 
-export default function Home() {
+export default function Home({navigation}) {
   const [URL, setURL] = useState('');
   // const [URLIsValid, setURLIsValid] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+
+  // check server info :)
+  const checkServerInfo = () => {
+    var requestOptions = {
+      method: 'GET',
+      redirect: 'follow',
+    };
+
+    fetch('https://igbot.tendean.my.id/indogram/server-info/', requestOptions)
+      .then(response => response.json())
+      .then(result => {
+        // redirect to Update page if current app version is lower than server version
+        if (result.data.version > 1) {
+          navigation.replace('Update');
+        }
+      })
+      .catch(error => {
+        navigation.replace('Maintenance');
+        // console.log('error', error);
+      });
+  };
+
+  useEffect(() => {
+    checkServerInfo();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleInputURL = url => {
     setURL(url);
