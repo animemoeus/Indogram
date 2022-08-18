@@ -1,13 +1,16 @@
 import React from 'react';
-import {StyleSheet, Text, View} from 'react-native';
+import {StatusBar, StyleSheet, Text, View} from 'react-native';
 
 export default function Maintenance() {
   return (
     <View style={styles.container}>
-      <Text style={styles.h1}>Opps..</Text>
+      <StatusBar backgroundColor="#E4DCCF" barStyle="dark-content" />
+
+      <Text style={styles.h1}>Opps...</Text>
 
       <Text style={styles.h2}>
-        Under maintenance {'\n'}Try again later 😜😝
+        Can't connect to the server 😖{'\n\n'}Check your internet connection or
+        try again later
       </Text>
     </View>
   );
