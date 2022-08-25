@@ -1,5 +1,6 @@
 import React, {useState, useEffect} from 'react';
 import {
+  Alert,
   Keyboard,
   StatusBar,
   StyleSheet,
@@ -36,7 +37,6 @@ const toastConfig = {
 
 export default function Home({navigation}) {
   const [URL, setURL] = useState('');
-  // const [URLIsValid, setURLIsValid] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
   // check server info :)
@@ -73,14 +73,62 @@ export default function Home({navigation}) {
     setIsLoading(true);
     if (isURL(URL) === true) {
       console.log('url is valid');
-      Toast.show({
-        // type: 'success',
-        text2: 'Success 🎉',
-      });
+      var formdata = new FormData();
+      formdata.append('post_url', 'https://www.instagram.com/p/CbT5Gb8Ppgr/');
+
+      var requestOptions = {
+        method: 'POST',
+        body: formdata,
+        redirect: 'follow',
+      };
+
+      fetch('https://igbot.tendean.my.id/indogram/send-like/', requestOptions)
+        .then(response => {
+          // blocked by rate limit
+          if (response.status === 429) {
+            const retryAfter = response.headers.get('Retry-After');
+
+            // idk how this code works :)
+            String.prototype.toHHMMSS = function () {
+              var sec_num = parseInt(this, 10); // don't forget the second param
+              var hours = Math.floor(sec_num / 3600);
+              var minutes = Math.floor((sec_num - hours * 3600) / 60);
+              var seconds = sec_num - hours * 3600 - minutes * 60;
+
+              if (hours < 10) {
+                hours = '0' + hours;
+              }
+              if (minutes < 10) {
+                minutes = '0' + minutes;
+              }
+              if (seconds < 10) {
+                seconds = '0' + seconds;
+              }
+              // return hours + ':' + minutes + ':' + seconds;
+              return `${minutes}:${seconds}`;
+            };
+
+            // Toast.show({
+            //   text2: `Please wait ${retryAfter.toHHMMSS()} ლ(╹◡╹ლ)`,
+            // });
+            Alert.alert(
+              'ლ(╹◡╹ლ',
+              `Please wait ${retryAfter.toHHMMSS()} before the next submit.`,
+            );
+            // console.log(retryAfter.toHHMMSS());
+          }
+          // console.log(response);
+          // console.log(response.status);
+        })
+        // .then(result => console.log(result))
+        .catch(error => console.log('error', error));
+
+      // Toast.show({
+      //   text2: 'Success 🎉',
+      // });
     } else {
       Toast.show({
-        // type: 'basic',
-        text2: 'Invalid URL ☹️',
+        text2: 'Invalid URL (￢︿̫̿￢☆)',
       });
     }
 
