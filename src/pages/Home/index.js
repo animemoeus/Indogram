@@ -72,7 +72,6 @@ export default function Home({navigation}) {
   const handleSubmitButton = () => {
     setIsLoading(true);
     if (isURL(URL) === true) {
-      console.log('url is valid');
       var formdata = new FormData();
       formdata.append('post_url', 'https://www.instagram.com/p/CbT5Gb8Ppgr/');
 
@@ -84,11 +83,14 @@ export default function Home({navigation}) {
 
       fetch('https://igbot.tendean.my.id/indogram/send-like/', requestOptions)
         .then(response => {
+          console.log(response.status);
+
           // blocked by rate limit
           if (response.status === 429) {
             const retryAfter = response.headers.get('Retry-After');
 
             // idk how this code works :)
+            // eslint-disable-next-line no-extend-native
             String.prototype.toHHMMSS = function () {
               var sec_num = parseInt(this, 10); // don't forget the second param
               var hours = Math.floor(sec_num / 3600);
@@ -108,20 +110,24 @@ export default function Home({navigation}) {
               return `${minutes}:${seconds}`;
             };
 
-            // Toast.show({
-            //   text2: `Please wait ${retryAfter.toHHMMSS()} ლ(╹◡╹ლ)`,
-            // });
             Alert.alert(
               'ლ(╹◡╹ლ',
               `Please wait ${retryAfter.toHHMMSS()} before the next submit.`,
             );
-            // console.log(retryAfter.toHHMMSS());
+          } else if (response.status === 200) {
+            Toast.show({
+              text2: 'Success ^o^/',
+            });
           }
-          // console.log(response);
-          // console.log(response.status);
+
+          return response.json();
         })
-        // .then(result => console.log(result))
-        .catch(error => console.log('error', error));
+        .catch(error => {
+          // console.log('error', error);
+          Toast.show({
+            text2: "Can't connect to server ┌( ´_ゝ` )┐",
+          });
+        });
 
       // Toast.show({
       //   text2: 'Success 🎉',
